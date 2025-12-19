@@ -6,9 +6,9 @@ Inspired by [meme-search](https://github.com/neonwatty/meme-search).
 
 ## Screenshots
 
-![Grid View](screenshots/grid.jpg)
-![Meme Detail](screenshots/detail.jpg)
-![Meme Editor](screenshots/editor.jpg)
+| Grid | Detail | Editor |
+|:---:|:---:|:---:|
+| <img src="screenshots/grid.jpg" width="280" alt="Grid View"> | <img src="screenshots/detail.jpg" width="280" alt="Meme Detail"> | <img src="screenshots/editor.jpg" width="280" alt="Meme Editor"> |
 
 ## Quick Start
 
