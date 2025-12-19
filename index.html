@@ -1195,6 +1195,10 @@
       const btn = document.getElementById('star-btn');
       btn.innerHTML = currentMeme.starred ? '<span class="icon">★</span> Starred' : '<span class="icon">☆</span> Star';
       btn.classList.toggle('starred', currentMeme.starred);
+      // Update memes array so grid reflects change
+      const idx = memes.findIndex(m => m.id === currentMeme.id);
+      if (idx >= 0) memes[idx] = currentMeme;
+      renderGrid(memes);
       loadStats();
     }
 
