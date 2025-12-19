@@ -1,0 +1,49 @@
+# ShitPostr - Meme Search & Generator
+services:
+  shitpostr:
+    build: .
+    container_name: shitpostr
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - meme-data:/data/memes
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-shitpostr}
+      - OLLAMA_URL=${OLLAMA_URL:-http://localhost:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llava:7b}
+      - ZIPLINE_URL=${ZIPLINE_URL:-}
+      - ZIPLINE_TOKEN=${ZIPLINE_TOKEN:-}
+      - STATIC_DIRS=${STATIC_DIRS:-/data/memes}
+    networks:
+      - shitpostr
+
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: shitpostr-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-shitpostr}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - shitpostr
+
+volumes:
+  db-data:
+  meme-data:
+
+networks:
+  shitpostr:

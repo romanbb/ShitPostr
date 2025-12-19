@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.svelte-kit/
+build/
+dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Lock files (optional - uncomment to track)
+# bun.lock
+
+# Data directories
+data/
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/
+data/
