@@ -76,6 +76,7 @@ POST /api/reset-errors      Reset errors to pending
 ## Environment Variables
 
 ```bash
+APP_NAME=ShitPostr                   # custom app name for branding
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/shitpostr
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llava:7b

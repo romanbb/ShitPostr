@@ -12,6 +12,7 @@ import { join, extname } from 'node:path';
 
 const pkg = await Bun.file('package.json').json();
 const VERSION = pkg.version;
+const APP_NAME = process.env.APP_NAME || 'ShitPostr';
 const PORT = parseInt(process.env.PORT || '3000');
 const DATABASE_URL = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/shitpostr';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
@@ -192,7 +193,7 @@ app.get('/images/*', async (c) => {
 
 // Health check
 app.get('/health', (c) => c.json({ ok: true }));
-app.get('/api/version', (c) => c.json({ version: VERSION }));
+app.get('/api/version', (c) => c.json({ version: VERSION, appName: APP_NAME }));
 
 // Config (for frontend)
 app.get('/api/config', (c) => c.json({
@@ -498,9 +499,9 @@ app.post('/api/generate-pending', async (c) => {
 // START
 // =============================================================================
 
-console.log('Initializing ShitPostr...');
+console.log(`Initializing ${APP_NAME}...`);
 await initDb();
 getEmbedder().catch(() => {}); // Warm up
 
 export default { port: PORT, fetch: app.fetch };
-console.log(`ShitPostr running on http://localhost:${PORT}`);
+console.log(`${APP_NAME} running on http://localhost:${PORT}`);

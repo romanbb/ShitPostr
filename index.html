@@ -792,7 +792,7 @@
 </head>
 <body>
   <header>
-    <h1><a href="/" style="color:inherit;text-decoration:none;">ShitPostr</a></h1>
+    <h1><a href="/" style="color:inherit;text-decoration:none;" id="app-name">ShitPostr</a></h1>
     <form id="search-form">
       <input type="text" id="search-input" placeholder="Search memes...">
       <button type="submit" class="btn-primary">Search</button>
@@ -1877,10 +1877,14 @@
       if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) loadMemes();
     };
 
-    // Load version
+    // Load version and app name
     async function loadVersion() {
       const data = await api('/version');
       if (data.version) document.getElementById('app-version').textContent = 'v' + data.version;
+      if (data.appName) {
+        document.title = data.appName;
+        document.getElementById('app-name').textContent = data.appName;
+      }
     }
 
     // Init
