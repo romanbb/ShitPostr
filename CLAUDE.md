@@ -16,16 +16,12 @@ docker compose up    # Full stack with PostgreSQL
 
 ## Architecture
 
-**6 files total:**
-
 | File | Purpose |
 |------|---------|
 | `index.ts` | All backend: Hono server, API routes, DB, Ollama, embeddings, scanner |
 | `index.html` | All frontend: vanilla JS/CSS, grid, modals, meme editor |
 | `schema.sql` | PostgreSQL + pgvector schema |
-| `package.json` | 4 dependencies |
 | `docker-compose.yml` | App + PostgreSQL containers |
-| `Dockerfile` | Container build |
 
 ## Stack
 
@@ -33,45 +29,14 @@ docker compose up    # Full stack with PostgreSQL
 - **Server**: Hono
 - **Database**: PostgreSQL 17 + pgvector
 - **Embeddings**: Xenova all-MiniLM-L6-v2 (384-dim vectors)
-- **Vision AI**: Ollama llava:7b (optional, for generating descriptions)
-- **Frontend**: Vanilla JS, no framework
-
-## Meme Templates
-
-Templates are stored in `/data/memes/` (Docker volume: `shitpostr_meme-data`).
-
-### Sources
-
-1. **Imgflip API** (`scripts/download-imgflip-api.sh`)
-   - Top 100 most-used meme templates
-   - Full-size images from official API
-   - Run: `./scripts/download-imgflip-api.sh /data/memes/imgflip-templates`
-
-2. **Migrated from meme-search** (Rails app)
-   - Original collection from `meme-search_meme-search-data` volume
-   - Additional templates from `memesmith_meme-search-data` volume
-
-### Current Collection
-
-- ~173 imgflip templates (Drake, Distracted Boyfriend, etc.)
-- ~14 other memes (examples, uploads)
-- All high-quality (no thumbnails, all files >5KB)
-
-### Adding More Templates
-
-```bash
-# Download from imgflip API:
-./scripts/download-imgflip-api.sh /data/memes/imgflip-templates
-
-# Then trigger a scan:
-curl -X POST http://localhost:3000/api/scan -H 'Content-Type: application/json' -d '{"directory": "/data/memes"}'
-```
+- **Vision AI**: Ollama llava:7b (optional)
+- **Frontend**: Vanilla JS
 
 ## API Endpoints
 
 ```
 GET  /                      HTML page
-GET  /images/*              Static image files
+GET  /images/*              Static image files (maps to /data/*)
 GET  /health                Health check
 
 GET  /api/memes             List memes (filters: status, starred)
@@ -97,12 +62,31 @@ POST /api/reset-errors      Reset errors to pending
 
 ## Environment Variables
 
-```
+```bash
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/shitpostr
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llava:7b
 UPLOAD_DIR=/data/memes/uploads
 PORT=3000
+
+# Multiple source directories (comma-separated)
+STATIC_DIRS=/data/memes
+
+# Zipline integration (optional)
+ZIPLINE_URL=https://your-zipline.com
+ZIPLINE_TOKEN=your-token
+```
+
+## Adding Memes
+
+```bash
+# Download imgflip templates
+./scripts/download-imgflip-api.sh /data/memes/imgflip-templates
+
+# Scan directory
+curl -X POST http://localhost:3000/api/scan \
+  -H 'Content-Type: application/json' \
+  -d '{"directory": "/data/memes"}'
 ```
 
 ## Deployment
@@ -111,9 +95,8 @@ PORT=3000
 docker compose up -d
 ```
 
-### Post-Deployment
-
-1. Check status: `docker ps | grep shitpostr`
-2. View logs: `docker logs -f shitpostr`
-3. Trigger scan: `curl -X POST http://localhost:3000/api/scan -H 'Content-Type: application/json' -d '{"directory": "/data/memes"}'`
-
+Verify:
+```bash
+docker ps | grep shitpostr
+docker logs -f shitpostr
+```

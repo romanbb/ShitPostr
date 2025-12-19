@@ -1,64 +1,67 @@
 # ShitPostr
 
-Meme search and management app with semantic search. Built for homelab self-hosting.
+Meme search and management app with semantic search. Built for homelab.
 
-Inspired by [meme-search](https://github.com/neonwatty/meme-search) by neonwatty.
+Inspired by [meme-search](https://github.com/neonwatty/meme-search).
 
 ## Quick Start
 
 ```bash
-# Local development
-bun install
-bun run dev
-
-# Production with Docker
-docker compose up
+bun install && bun run dev     # Development
+docker compose up              # Production
 ```
 
 ## Features
 
-- **Semantic Search**: Vector-based search using all-MiniLM-L6-v2 embeddings (384-dim)
-- **Hybrid Search**: Combines vector similarity with filename matching
-- **AI Descriptions**: Optional Ollama llava:7b for auto-generating meme descriptions
-- **Meme Editor**: Built-in editor with text overlays, fonts, colors, positioning
-- **Zipline Integration**: Share edited memes directly to your Zipline instance
-- **Multiple Source Directories**: Mount multiple meme collections via Docker volumes
+- **Semantic Search**: Vector embeddings (all-MiniLM-L6-v2) + filename matching
+- **AI Descriptions**: Ollama vision model describes memes automatically
+- **Meme Editor**: Add text overlays, choose fonts/colors
+- **Zipline Sharing**: One-click upload edited memes to Zipline
+- **Multi-Directory**: Mount multiple meme collections
+- **Mobile Friendly**: Responsive layout for phone/tablet
+
+## Ollama Integration
+
+Generates searchable descriptions for memes using vision AI.
+
+1. Run Ollama with a vision model: `ollama pull llava:7b`
+2. Set `OLLAMA_URL` (default: `http://localhost:11434`)
+3. Click "Generate" on a meme or use batch generate in Settings
+
+The model analyzes each image and creates a text description used for semantic search.
 
 ## Zipline Integration
 
-Share edited memes directly to Zipline with one click:
+Share edited memes to your [Zipline](https://github.com/diced/zipline) instance.
 
+1. Set `ZIPLINE_URL` to your Zipline upload endpoint
+2. Set `ZIPLINE_TOKEN` to your API token
+3. Edit a meme → click "Share to Zipline" → URL copied to clipboard
+
+## Uploads
+
+Drag & drop or click to upload images via the UI. Files save to `UPLOAD_DIR` (default `/data/memes/uploads`) and are automatically added to the database with "pending" status.
+
+## Scanning
+
+Scan directories to import existing meme collections:
+
+```bash
+curl -X POST http://localhost:3000/api/scan \
+  -H 'Content-Type: application/json' \
+  -d '{"directory": "/data/memes"}'
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   ShitPostr │───►│   Zipline   │───►│  Clipboard  │
-│  Meme Editor│    │   Upload    │    │  Share URL  │
-└─────────────┘    └─────────────┘    └─────────────┘
-        │                 │
-        ▼                 ▼
-   Canvas blob      POST /api/upload
-   (PNG export)     Authorization: token
-```
 
-1. Edit meme in ShitPostr's meme editor
-2. Click "Share to Zipline" button
-3. Canvas exports as PNG blob
-4. Blob uploads to Zipline via API
-5. Zipline URL copied to clipboard
-
-Configure with `ZIPLINE_URL` and `ZIPLINE_TOKEN` environment variables.
+The scanner recursively finds images (jpg, png, gif, webp, avif), adds them to the database, and extracts titles from filenames. Use Settings UI to trigger scans or batch-generate AI descriptions.
 
 ## Architecture
-
-6 files total:
 
 | File | Purpose |
 |------|---------|
 | `index.ts` | All backend: Hono server, API routes, DB, embeddings, scanner |
 | `index.html` | All frontend: vanilla JS/CSS, grid, modals, meme editor |
 | `schema.sql` | PostgreSQL + pgvector schema |
-| `package.json` | 4 dependencies |
 | `docker-compose.yml` | App + PostgreSQL containers |
-| `Dockerfile` | Container build |
 
 ## Stack
 
@@ -78,12 +81,12 @@ OLLAMA_MODEL=llava:7b
 UPLOAD_DIR=/data/memes/uploads
 PORT=3000
 
-# Zipline integration
-ZIPLINE_URL=https://your-zipline-instance.com
-ZIPLINE_TOKEN=your-api-token
+# Zipline (optional)
+ZIPLINE_URL=https://your-zipline.com
+ZIPLINE_TOKEN=your-token
 
 # Multiple source directories (comma-separated)
-STATIC_DIRS=/data/memes,/data/imgflip,/data/community
+STATIC_DIRS=/data/memes,/data/imgflip
 ```
 
 ## Multiple Source Directories
@@ -94,18 +97,22 @@ Mount multiple meme collections as separate Docker volumes:
 services:
   shitpostr:
     environment:
-      - STATIC_DIRS=/data/memes,/data/imgflip,/data/community
+      - STATIC_DIRS=/data/memes,/data/imgflip
     volumes:
-      - meme-data:/data/memes          # uploads
-      - imgflip-data:/data/imgflip      # imgflip templates
-      - community-data:/data/community  # other sources
+      - meme-data:/data/memes
+      - imgflip-data:/data/imgflip
 ```
 
 Then scan each directory:
 ```bash
-curl -X POST http://localhost:3000/api/scan -H 'Content-Type: application/json' \
+curl -X POST http://localhost:3000/api/scan \
+  -H 'Content-Type: application/json' \
   -d '{"directory": "/data/imgflip"}'
 ```
+
+## Development
+
+Built with [Claude Code](https://claude.ai/claude-code).
 
 ## License
 

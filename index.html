@@ -92,7 +92,19 @@
       border-right: 1px solid var(--border);
       flex-shrink: 0;
       background: linear-gradient(180deg, var(--bg) 0%, rgba(9,9,11,0.5) 100%);
+      display: flex;
+      flex-direction: column;
     }
+    aside .nav-section { flex: 1; }
+    aside .about {
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text3);
+      line-height: 1.8;
+    }
+    aside .about a { color: var(--text2); text-decoration: none; }
+    aside .about a:hover { color: var(--accent); }
     aside h3 {
       font-size: 0.65rem;
       color: var(--text3);
@@ -776,15 +788,20 @@
 
   <main>
     <aside>
-      <h3>Browse</h3>
-      <button class="active" onclick="setFilter({})">All <span class="count" id="stat-total">0</span></button>
-      <button onclick="setFilter({starred:'true'})">Starred <span class="count" id="stat-starred">0</span></button>
+      <div class="nav-section">
+        <h3>Browse</h3>
+        <button class="active" onclick="setFilter({})">All <span class="count" id="stat-total">0</span></button>
+        <button onclick="setFilter({starred:'true'})">Starred <span class="count" id="stat-starred">0</span></button>
 
-      <h3>Status</h3>
-      <button onclick="setFilter({status:'pending'})">Pending <span class="count" id="stat-pending">0</span></button>
-      <button onclick="setFilter({status:'complete'})">Complete <span class="count" id="stat-complete">0</span></button>
-      <button onclick="setFilter({status:'processing'})">Processing <span class="count" id="stat-processing">0</span></button>
-      <button onclick="setFilter({status:'error'})">Errors <span class="count" id="stat-error">0</span></button>
+        <h3>Status</h3>
+        <button onclick="setFilter({status:'pending'})">Pending <span class="count" id="stat-pending">0</span></button>
+        <button onclick="setFilter({status:'complete'})">Complete <span class="count" id="stat-complete">0</span></button>
+        <button onclick="setFilter({status:'processing'})">Processing <span class="count" id="stat-processing">0</span></button>
+        <button onclick="setFilter({status:'error'})">Errors <span class="count" id="stat-error">0</span></button>
+      </div>
+      <div class="about">
+        <span id="app-version">v...</span> · <a href="https://github.com/romanbb/ShitPostr" target="_blank">GitHub</a>
+      </div>
     </aside>
 
     <div id="content">
@@ -1124,10 +1141,12 @@
 
     async function openDetail(id) {
       try {
+        // Clear old image immediately to prevent flash
+        const detailImg = document.getElementById('detail-img');
+        detailImg.src = '';
         currentMeme = await api('/memes/' + id);
         if (currentMeme.error) { alert('Meme not found'); return; }
-        const imgSrc = filePathToUrl(currentMeme.file_path);
-        document.getElementById('detail-img').src = imgSrc;
+        detailImg.src = filePathToUrl(currentMeme.file_path);
         document.getElementById('detail-title').textContent = currentMeme.title || 'Meme';
         document.getElementById('detail-status').textContent = currentMeme.status;
         document.getElementById('detail-desc').textContent = currentMeme.description || 'No description yet';
@@ -1833,9 +1852,16 @@
       if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) loadMemes();
     };
 
+    // Load version
+    async function loadVersion() {
+      const data = await api('/version');
+      if (data.version) document.getElementById('app-version').textContent = 'v' + data.version;
+    }
+
     // Init
     loadFromUrl();
     loadStats();
+    loadVersion();
     checkOllama();
   </script>
 </body>

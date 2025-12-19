@@ -10,6 +10,8 @@ import { join, extname } from 'node:path';
 // CONFIG
 // =============================================================================
 
+const pkg = await Bun.file('package.json').json();
+const VERSION = pkg.version;
 const PORT = parseInt(process.env.PORT || '3000');
 const DATABASE_URL = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/shitpostr';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
@@ -190,6 +192,7 @@ app.get('/images/*', async (c) => {
 
 // Health check
 app.get('/health', (c) => c.json({ ok: true }));
+app.get('/api/version', (c) => c.json({ version: VERSION }));
 
 // Config (for frontend)
 app.get('/api/config', (c) => c.json({
