@@ -1,8 +1,12 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 ## Project Overview
 
-ShitPostr is a meme search and management app with semantic search. Single-file architecture.
+ShitPostr is a meme search and management app with semantic search. Built for homelab self-hosting.
+
+**Philosophy**: Single-file architecture. All backend logic in `index.ts`, all frontend in `index.html`. Keep it simple.
 
 ## Commands
 
@@ -23,6 +27,14 @@ docker compose up    # Full stack with PostgreSQL
 | `schema.sql` | PostgreSQL + pgvector schema |
 | `docker-compose.yml` | App + PostgreSQL containers |
 
+## Key Patterns
+
+- **Static files**: `/images/*` route maps to `/data/*` directories (configured via `STATIC_DIRS`)
+- **Search**: Hybrid approach combining vector similarity + filename regex matching
+- **Embeddings**: Generated client-side with Xenova transformers, stored as pgvector
+- **Frontend state**: Global variables (`memes`, `currentMeme`, `filters`), vanilla JS DOM manipulation
+- **URL helper**: `filePathToUrl()` converts DB paths to serving URLs
+
 ## Stack
 
 - **Runtime**: Bun
@@ -38,6 +50,7 @@ docker compose up    # Full stack with PostgreSQL
 GET  /                      HTML page
 GET  /images/*              Static image files (maps to /data/*)
 GET  /health                Health check
+GET  /api/version           App version from package.json
 
 GET  /api/memes             List memes (filters: status, starred)
 GET  /api/memes/:id         Single meme
@@ -68,13 +81,9 @@ OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llava:7b
 UPLOAD_DIR=/data/memes/uploads
 PORT=3000
-
-# Multiple source directories (comma-separated)
-STATIC_DIRS=/data/memes
-
-# Zipline integration (optional)
-ZIPLINE_URL=https://your-zipline.com
-ZIPLINE_TOKEN=your-token
+STATIC_DIRS=/data/memes              # comma-separated for multiple
+ZIPLINE_URL=https://your-zipline.com # optional
+ZIPLINE_TOKEN=your-token             # optional
 ```
 
 ## Adding Memes
@@ -93,10 +102,6 @@ curl -X POST http://localhost:3000/api/scan \
 
 ```bash
 docker compose up -d
-```
-
-Verify:
-```bash
 docker ps | grep shitpostr
 docker logs -f shitpostr
 ```
