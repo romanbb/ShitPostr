@@ -4,6 +4,12 @@ Meme search and management app with semantic search. Built for homelab.
 
 Inspired by [meme-search](https://github.com/neonwatty/meme-search).
 
+## Screenshots
+
+![Grid View](screenshots/grid.jpg)
+![Meme Detail](screenshots/detail.jpg)
+![Meme Editor](screenshots/editor.jpg)
+
 ## Quick Start
 
 ```bash
