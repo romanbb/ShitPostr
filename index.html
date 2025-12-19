@@ -273,7 +273,7 @@
       justify-content: center;
       transition: all 0.2s;
     }
-    .close:hover { background: var(--error); color: white; transform: rotate(90deg); }
+    .close:hover { background: var(--error); color: white; }
 
     /* Unified Meme Modal */
     #meme-modal .modal-content {
@@ -338,11 +338,26 @@
     }
     #meme-modal .view-panel .modal-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
     #meme-modal .edit-panel .modal-header {
-      padding: 1rem 1.25rem;
+      padding: 0.75rem 1.25rem;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      min-height: 52px;
+    }
+    #meme-modal .edit-panel .modal-header .close {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      padding: 0;
+      font-size: 1rem;
+      line-height: 1;
+      background: var(--bg3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
     #meme-modal .edit-panel .modal-header h3 {
       flex: 1;
@@ -352,14 +367,18 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin: 0;
+      line-height: 28px;
     }
     #meme-modal .back-btn {
       background: none;
       border: none;
       color: var(--text2);
-      padding: 0.4rem 0.6rem;
+      padding: 0.35rem 0.5rem;
       font-size: 0.85rem;
       cursor: pointer;
+      line-height: 1;
+      border-radius: var(--radius);
+      flex-shrink: 0;
     }
     #meme-modal .back-btn:hover { color: var(--text); background: var(--bg3); }
     #meme-modal .editor-settings { flex: 1; overflow-y: auto; padding: 1.25rem; }
